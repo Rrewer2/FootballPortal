@@ -1,0 +1,24 @@
+@import "../../style/variables.scss";
+
+.standings-table {
+    margin-top: 30px;
+    padding: 25px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+    z-index: 5;
+    background-color: #fff;
+
+    &__header {
+        text-align: center;
+        color: $main-color;
+    }
+    &-item {
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
+        font-size: 16px;
+        line-height: 32px;
+        font-weight: bold;
+        text-align: center;
+    }
+    &__name {
+        text-align: left;
+    }
+}

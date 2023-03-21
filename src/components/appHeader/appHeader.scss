@@ -1,0 +1,46 @@
+@import '../../style/variables.scss';
+
+.app {
+    background-color: rgb(0,0,0,.05);
+    &__header {
+        // background-color: rgb(0,0,0,.05);
+        display: flex;
+        justify-content: space-between;
+        img {
+            width: 100px;
+            height: 70px;
+        }
+    }
+    &__title {
+        font-weight: bold;
+        font-size: 28px;
+        line-height: 37px;
+        span {
+            color: $main-color;
+        }
+    }
+    &__select {
+        font-weight: bold;
+        font-size: 28px;
+        line-height: 37px;
+        color: $dark;
+    }
+    &__menu {
+        &_nav {
+            color: $main-color;
+        }
+        ul {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 24px;
+            line-height: 32px;
+            li {
+                margin: 0 8px;
+                a:hover {
+                    color: $main-color;
+                }
+            }
+        }
+    }
+}
