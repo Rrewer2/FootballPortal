@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { extractData } from "../services/functions";
 
 const useHttp = () => {
     const [process, setProcess] = useState("loading");
@@ -37,9 +38,11 @@ const useHttp = () => {
     const _apiBase = "https://soccer.sportmonks.com/api/v2.0/";
     const _apiToken =
         "?api_token=NxNGqgpNVYAkId7YahZNUBRqz3g69rlNzCyYnb9JWvbJ9WzksabHFKm2d6pF";
-    const extractData = ({ data }) => data;
-    const getFromAPI = (baseURL, token, cb) => (chapter) => async (endpoint) =>
-        cb(await request(`${baseURL}${chapter}${endpoint}${token}`));
+    const getFromAPI =
+        (baseURL, token, cb) =>
+        (chapter) =>
+        async (endpoint, page = "") =>
+            cb(await request(`${baseURL}${chapter}${endpoint}${token}${page}`));
 
     const getDataFromApi = getFromAPI(_apiBase, _apiToken, extractData);
     return { getDataFromApi, cleanError, process, setProcess };

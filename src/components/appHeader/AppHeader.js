@@ -1,80 +1,54 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import useFootballService from "../../services/FootballService";
+import Spinner from "../spinner/Spinner";
 import "./appHeader.scss";
 
-const AppHeader = ({ onCountrySelected }) => {
-    const defValue = 1161;
-
-    const [countryId, setCountryId] = useState(defValue);
-    const [flag, setFlag] = useState(null);
-
-    const { getFlag } = useFootballService();
-
-    const updateFlag = () => {
-        getFlag(countryId).then(setFlag);
-    };
-
-    useEffect(updateFlag, [countryId]);
+const AppHeader = ({ onCountrySelected, flag, process }) => {
     const navigate = useNavigate();
 
+    const isLoading = process === "loading";
+
     return (
-        <header className="app__header">
-            <h1 className="app__title">
-                <Link to="/">
+        <header className="app-header">
+            <Link to="/" className="app-header__link">
+                <h1 className="app-header__title">
                     <span>Football</span> information portal
-                </Link>
-            </h1>
-            <form
-                className="app__select"
-                onChange={(e) => {
-                    onCountrySelected(e.target.value);
-                    setCountryId(e.target.value);
-                }}
-            >
-                <input
-                    type="radio"
-                    id="Scotland"
-                    name="selectedCountry"
-                    value={1161}
-                    defaultChecked
-                />
-                <label className="app__title" htmlFor="Scotland">
+                </h1>
+            </Link>
+            <form className="app-header__select" onChange={onCountrySelected}>
+                <label className="app-header__country" htmlFor="Scotland">
+                    <input
+                        type="radio"
+                        id="Scotland"
+                        name="selectedCountry"
+                        value="Scotland"
+                        defaultChecked
+                    />
                     Scotland
                 </label>
-                <input
-                    type="radio"
-                    id="Denmark"
-                    name="selectedCountry"
-                    value={320}
-                />
-                <label className="app__title" htmlFor="Denmark">
+
+                <label className="app-header__country" htmlFor="Denmark">
+                    <input
+                        type="radio"
+                        id="Denmark"
+                        name="selectedCountry"
+                        value="Denmark"
+                    />
                     Denmark
                 </label>
             </form>
-            <img src={flag} alt="" />
-            <nav className="app__menu">
-                <ul>
-                    <li>
-                        <NavLink
-                            className={({ isActive }) =>
-                                "app__menu" + (isActive ? "_nav" : "")
-                            }
-                            to="/"
-                        >
-                            Teams
-                        </NavLink>
-                    </li>
-                    /
-                    <li>
-                        <Link
-                            className="app__menu"
-                            onClick={() => navigate(-1)}
-                        >
-                            Back
-                        </Link>
-                    </li>
-                </ul>
+            {isLoading || !flag ? (
+                <Spinner className="spinner" />
+            ) : (
+                <img src={flag} alt="flag" className="app-header__img" />
+            )}
+            <nav className="app-header__menu">
+                <NavLink className="app-header__nav" to="/">
+                    Teams
+                </NavLink>
+                <p>/</p>
+                <Link className="app-header__nav" onClick={() => navigate(-1)}>
+                    Back
+                </Link>
             </nav>
         </header>
     );

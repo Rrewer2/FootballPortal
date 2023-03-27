@@ -1,0 +1,11 @@
+.single-game {
+    &__winner {
+        color: goldenrod;
+    }
+    &__draw {
+        color: green;
+    }
+    &__loose {
+        color: grey;
+    }
+}

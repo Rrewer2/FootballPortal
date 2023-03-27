@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import useFootballService from "../../services/footballService";
-import Spinner from "../spinner/Spinner";
-import ErrorMessage from "../errorMessage/ErrorMessage";
+import useFootballService from "./FootballService";
+// import Spinner from "../components/spinner/Spinner";
+// import ErrorMessage from "../components/errorMessage/ErrorMessage";
 
-const LayoutComponent = ({ Component, funcName, param, ...args }) => {
+const LayoutComponent = ({ funcName, param }) => {
+    console.log(funcName, param);
     const [data, setData] = useState(null);
 
     const obj = useFootballService();
@@ -28,16 +29,11 @@ const LayoutComponent = ({ Component, funcName, param, ...args }) => {
 
     const layout = (process) => {
         const content = {
-            render: () => (
-                <Component
-                    data={data}
-                    updateData={updateData}
-                    process={process}
-                    args={args}
-                />
-            ),
-            loading: () => <Spinner process={process} />,
-            error: () => <ErrorMessage updateData={updateData} />,
+            render: () => ({ ...data, updateData, process }),
+            // loading: () => <Spinner process={process} />,
+            // error: () => <ErrorMessage updateData={updateData} />,
+            loading: () => ({ process }),
+            error: () => ({ process, updateData }),
             default: () => {
                 throw new Error("Unexpected process state");
             },

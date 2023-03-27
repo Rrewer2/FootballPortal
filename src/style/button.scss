@@ -1,4 +1,4 @@
-@import './variables';
+@import "./variables";
 
 .button {
     min-width: 101px;
@@ -18,7 +18,6 @@
     .inner {
         position: relative;
         background-color: $main-color;
-        line-height: 18px;
         padding: 0 18px;
         transition: none;
         &::before {
@@ -45,50 +44,51 @@
             transition: none;
         }
     }
-    &__main, &__secondary {
+    &__main,
+    &__secondary {
         &:hover {
             color: #fff;
         }
     }
     &__secondary {
         .inner {
-            background-color: $grey;
+            background-color: $third-color;
             &::before {
-                border-color: $grey transparent;
+                border-color: $third-color transparent;
                 transition: none;
             }
             &::after {
-                border-color: $grey transparent; 
+                border-color: $third-color transparent;
                 transition: none;
             }
         }
     }
     &::before {
-        content: '';
+        content: "";
         display: block;
         height: 10px;
         margin-left: 10px;
         transition: none;
-
     }
     &::after {
-        content: '';
+        content: "";
         display: block;
         height: 10px;
         margin-right: 10px;
         transition: none;
-
     }
-    &.button__main::before, &.button__main::after {
+    &.button__main::before,
+    &.button__main::after {
         background-color: $main-color;
     }
-    &.button__secondary::before, &.button__secondary::after {
-        background-color: $grey;
+    &.button__secondary::before,
+    &.button__secondary::after {
+        background-color: $third-color;
     }
     &:hover {
         transform: translateY(-5px);
     }
     &:disabled {
-        filter: grayscale(.5)
+        filter: grayscale(0.5);
     }
 }

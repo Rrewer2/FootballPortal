@@ -8,34 +8,30 @@
     grid-template-columns: 550px 400px;
     column-gap: 50px;
     align-items: start;
-    h1,
-    h2 {
+    &__title {
         margin-top: 25px;
+        &-winner {
+            color: goldenrod;
+        }
+        &-draw {
+            color: green;
+        }
+        &-loose {
+            color: grey;
+        }
     }
-    &__img {
-        margin: 20px;
-    }
-    &__name {
+    &__time {
         font-weight: bold;
         font-size: 22px;
     }
-    &__descr {
+    &__city {
         font-size: 24px;
         margin-top: 20px;
     }
-    &__price {
+    &__capacity {
         font-weight: bold;
         font-size: 24px;
         color: $main-color;
         margin-top: 25px;
-    }
-    &__back {
-        margin-top: 100px;
-        justify-self: end;
-        font-weight: bold;
-        font-size: 38px;
-        &:hover {
-            color: $main-color;
-        }
     }
 }

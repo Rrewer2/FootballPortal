@@ -1,24 +1,39 @@
 @import "../../style/variables.scss";
 
 .standings-table {
-    margin-top: 30px;
+    a {
+        display: block;
+        text-align: left;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
     padding: 25px;
+    width: 100%;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
-    z-index: 5;
-    background-color: #fff;
-
+    min-height: 385px;
     &__header {
         text-align: center;
         color: $main-color;
     }
-    &-item {
+    &__item {
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.25);
         font-size: 16px;
-        line-height: 32px;
+        line-height: 20px;
         font-weight: bold;
         text-align: center;
+        background-color: rgba(0, 0, 0, 0.05);
     }
     &__name {
         text-align: left;
+        display: table-cell;
+        line-height: 24px;
+        text-transform: uppercase;
+    }
+    &__selected {
+        background-color: goldenrod;
+    }
+    &__points {
+        color: $main-color;
     }
 }

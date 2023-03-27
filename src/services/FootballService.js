@@ -1,16 +1,50 @@
 import useHttp from "../hooks/http.hooks";
+import { sliceTopscorers, extractData } from "./functions";
 
 const useFootballService = () => {
     const { getDataFromApi, cleanError, process, setProcess } = useHttp();
 
+    const getAllCountry = getDataFromApi("countries");
     const getCountry = getDataFromApi("countries/");
     const getVenue = getDataFromApi("venues/");
-    const getSeason = getDataFromApi("standings/season/");
     const getTeam = getDataFromApi("teams/");
     const getFixtures = getDataFromApi("fixtures/");
-    const getHead2Head = getDataFromApi("head2head/");
+    const getHeadToHead = getDataFromApi("head2head/");
+    const getRankings = getDataFromApi("standings/season/");
+    const getAllVenues = getDataFromApi("venues/season/");
+    const getallTeams = getDataFromApi("teams/season/");
+    const getTopScorers = getDataFromApi("topscorers/season/");
+    const getPlayer = getDataFromApi("players/");
 
-    const getStadion = async (venue_id) => {
+    const findPlayer = async (id) => await getPlayer(id);
+
+    const findFewPlayersById = async (topScorers, teamId) => {
+        const allPlayers = [];
+        const slicedTopcorers = sliceTopscorers(topScorers, teamId);
+        const ids = slicedTopcorers.flat().map((el) => el.player_id);
+
+        const length = ids.length;
+        for (let i = 0; i < length; i++) {
+            allPlayers.push(await findPlayer(ids[i]));
+        }
+        return { slicedTopcorers, allPlayers };
+    };
+
+    const findTopscoreres = async (id) => {
+        const topScorers = await getTopScorers(`${id}/aggregated`);
+        const {
+            aggregatedGoalscorers,
+            aggregatedAssistscorers,
+            aggregatedCardscorers,
+        } = topScorers;
+        return [
+            aggregatedGoalscorers,
+            aggregatedAssistscorers,
+            aggregatedCardscorers,
+        ].map((el) => extractData(el));
+    };
+
+    const findStadion = async (venue_id) => {
         if (!venue_id) {
             return {
                 name: "___",
@@ -22,11 +56,10 @@ const useFootballService = () => {
         return await getVenue(venue_id);
     };
 
-    const getOneTeam = async (team_id) => {
+    const findOneTeam = async (team_id) => {
         const team = await getTeam(team_id);
         return transformTeam(team);
     };
-    const plusZero = (num) => `${num > 9 ? "" : 0}${num}`;
 
     const transformGame = ({
         formations,
@@ -52,100 +85,162 @@ const useFootballService = () => {
 
     const transformTeam = ({ name, ...args }) => ({ teamName: name, ...args });
 
-    const getStandings = async (countryId) => {
+    const findSeason = async (countryId) => {
         const league = await getCountry(`${countryId}/leagues`);
-        const current_season_id = league[0]?.current_season_id;
-        const season = await getSeason(current_season_id);
+        return league[0]?.current_season_id;
+    };
 
+    const findStandings = async (current_season_id) => {
+        const season = await getRankings(current_season_id);
         return season[0]?.standings?.data;
     };
 
-    const getGamesList = async (teamId) => {
-        const team = await getOneTeam(teamId);
-        const allTeams = await getAllTeams(team.country_id);
+    // const getGamesList = async (teamId) => {
+    //     const team = await getOneTeam(teamId);
+    //     const allTeams = await getAllTeams(team.country_id);
 
-        return { team, allTeams };
-    };
+    //     return { team, allTeams };
+    // };
 
-    const getFlag = async (countryId) => {
+    const findFlag = async (countryId) => {
         const country = await getCountry(countryId);
         return country?.image_path;
     };
 
-    const getAllTeams = async (selectedCountry) => {
+    const findCountryTeams = async (selectedCountry) => {
         const teams = await getCountry(`${selectedCountry}/teams`);
         return teams?.map(transformTeam);
     };
 
-    const getRandomTeam = async (selectedCountry) => {
-        const teams = await getAllTeams(selectedCountry);
+    const findRandomTeam = async (selectedCountry) => {
+        const teams = await findCountryTeams(selectedCountry);
         const team = teams[Math.round(Math.random() * teams.length - 1)];
-        const stadion = await getStadion(team.venue_id);
+        const stadion = await findStadion(team.venue_id);
 
         return { team, stadion };
     };
 
-    const getTeamInfoById = async (team_id) => {
-        const team = await getOneTeam(team_id);
-        const stadion = await getStadion(team.venue_id);
+    const findTeamInfoById = async (team_id) => {
+        const team = await findOneTeam(team_id);
+        const stadion = await findStadion(team.venue_id);
 
         return { team, stadion };
     };
 
-    const getTeamInfoByName = async (name) => await getTeam(`search/${name}`);
+    const findTeamInfoByName = async (name) => await getTeam(`search/${name}`);
 
-    const getAllGamesByDate = async (month, teamId) => {
-        const newDate = (a) => [a.getFullYear(), a.getMonth(), a.getDate()];
-
-        const [YYYY, MM, DD] = newDate(new Date());
-        let [nextYear, nextMonth, nextDay] = newDate(
-            new Date(YYYY, MM + 1 - month, DD)
-        );
-        let [prevYear, prevMonth, prevDay] = newDate(
-            new Date(YYYY, MM - month, DD + 1)
-        );
-
-        nextMonth = plusZero(nextMonth + 1);
-        prevMonth = plusZero(prevMonth + 1);
-        nextDay = plusZero(nextDay);
-        prevDay = plusZero(prevDay);
-
-        const period = `${prevYear}-${prevMonth}-${prevDay}/${nextYear}-${nextMonth}-${nextDay}`;
+    const findAllGamesByDate = async (period, teamId) => {
         const games = await getFixtures(`between/${period}/${teamId}`);
 
-        return { newGames: games?.reverse().map(transformGame), period };
+        return games.reverse().map(transformGame);
     };
 
-    const getSingleGame = async (gameId) => {
+    const findHead2Head = async (gameId) => {
+        const game = await findFixture(gameId);
+        const { localteam_id, visitorteam_id } = game;
+        const local = await findOneTeam(localteam_id);
+        const visitor = await findOneTeam(visitorteam_id);
+        const lastGames = await getHeadToHead(
+            `${localteam_id}/${visitorteam_id}`
+        );
+        const array = lastGames.slice(0, 10).map(transformGame);
+        return {
+            array,
+            localId: localteam_id,
+            l_name: local.teamName,
+            visitId: visitorteam_id,
+            v_name: visitor.teamName,
+        };
+    };
+
+    const findFixture = async (gameId) => {
         const fixture = await getFixtures(gameId);
-        const game = transformGame(fixture);
+        return transformGame(fixture);
+    };
+    const findGameInfo = async ([selectedGame, gameId]) => {
+        const id = selectedGame ? selectedGame : gameId;
+        const game = await findFixture(id);
 
         const { localteam_id, visitorteam_id, venue_id } = game;
 
-        const local = await getOneTeam(localteam_id);
-        const visitor = await getOneTeam(visitorteam_id);
-        const stadion = await getStadion(venue_id);
-        const lastGames = await getHead2Head(
-            `${localteam_id}/${visitorteam_id}`
-        );
-        const head2head = lastGames.slice(0, 10).map(transformGame);
+        const local = await findOneTeam(localteam_id);
+        const visitor = await findOneTeam(visitorteam_id);
+        const stadion = await findStadion(venue_id);
 
-        return { game, local, visitor, stadion, head2head };
+        return { game, local, visitor, stadion };
     };
+
+    const findSeasonTeams = async (season_id) => {
+        const teams = await getallTeams(season_id);
+        return !teams ? null : teams.map(transformTeam);
+    };
+
+    //____________________________________________________________________________________
+    //____________________________________________________________________________________
+
+    const appInfo = async (countryName) => {
+        if (!countryName) return;
+        const allCountries = await getAllCountry("");
+        const { id, image_path } = allCountries.find(
+            ({ name }) => name === countryName
+        );
+        const season_id = await findSeason(id);
+        const seasonTeams = await findSeasonTeams(season_id);
+        const topScorers = await findTopscoreres(season_id);
+
+        return { teams: seasonTeams, season_id, topScorers, image_path };
+    };
+
+    const mainPageInfo = async ({ season_id, topScorers }) => {
+        const venues = await getAllVenues(season_id);
+        const standings = await findStandings(season_id);
+        const { slicedTopcorers, allPlayers } = await findFewPlayersById(
+            topScorers
+        );
+        console.log(allPlayers);
+
+        return { venues, standings, allPlayers, slicedTopcorers };
+    };
+
+    const teamPageInfo = async ({ period, teamId, topScorers }) => {
+        const games = await findAllGamesByDate(period, teamId);
+        const mainTeam = await findOneTeam(teamId);
+        const allTeams = await findCountryTeams(mainTeam.country_id);
+        const { slicedTopcorers, allPlayers } = await findFewPlayersById(
+            topScorers,
+            teamId
+        );
+        console.log(slicedTopcorers);
+        return { mainTeam, allTeams, games, allPlayers, slicedTopcorers };
+        // return;
+    };
+
+    const gamePageInfo = async () => {};
+
+    // const getSingleGame = async (gameId) => {
+    //     const fixture = await getFixtures(gameId);
+    //     const game = transformGame(fixture);
+
+    //     const { localteam_id, visitorteam_id, venue_id } = game;
+
+    //     const local = await getOneTeam(localteam_id);
+    //     const visitor = await getOneTeam(visitorteam_id);
+    //     const stadion = await getStadion(venue_id);
+    //     const lastGames = await getHeadToHead(
+    //         `${localteam_id}/${visitorteam_id}`
+    //     );
+    //     const head2head = lastGames.slice(0, 10).map(transformGame);
+
+    //     return { game, local, visitor, stadion, head2head };
+    // };
 
     return {
         cleanError,
         process,
         setProcess,
-        getAllTeams,
-        getRandomTeam,
-        getTeamInfoById,
-        getTeamInfoByName,
-        getAllGamesByDate,
-        getFlag,
-        getStandings,
-        getSingleGame,
-        getGamesList,
+        appInfo,
+        mainPageInfo,
+        teamPageInfo,
     };
 };
 

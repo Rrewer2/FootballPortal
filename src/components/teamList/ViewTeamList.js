@@ -1,18 +1,21 @@
 import React, { useRef } from "react";
+import "./teamList.scss";
 
 const ViewTeamList = ({ data, args }) => {
-    const { onTeamSelected } = args;
     const { current } = useRef([]);
 
+    if (!data || !args) return <ul className="team__grid"></ul>;
+
+    const { onTeamSelected } = args;
     const focusOnItem = (i, id) => {
-        current.map(({ classList }) => classList.remove("team__item_selected"));
-        current[i].classList.add("team__item_selected");
+        current.map(({ classList }) => classList.remove("team__item-selected"));
+        current[i].classList.add("team__item-selected");
         current[i].focus();
         onTeamSelected(id);
     };
 
     const teams = data.map(({ id, logo_path, teamName, founded }, i) => {
-        const fontSize = teamName.length > 11 ? "18px" : "22px";
+        const isLong = teamName?.length > 10 ? "team__item-name-long" : "";
         return (
             <li
                 key={id}
@@ -27,12 +30,19 @@ const ViewTeamList = ({ data, args }) => {
                         focusOnItem(i, id);
                     }
                 }}
+                onBlur={() => {
+                    current.map(({ classList }) =>
+                        classList.remove("team__item-selected")
+                    );
+                }}
             >
-                <img src={logo_path} alt={teamName} />
-                <div style={{ fontSize: fontSize }} className="team__name">
-                    {teamName}
-                </div>
-                <div className="team__name">founded: {founded}</div>
+                <img
+                    className="team__item-img"
+                    src={logo_path}
+                    alt={teamName}
+                />
+                <h2 className={`team__item-name ${isLong}`}>{teamName}</h2>
+                {/* <h3 className="team__item-descr">founded: {founded}</h3> */}
             </li>
         );
     });

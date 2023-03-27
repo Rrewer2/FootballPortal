@@ -1,62 +1,50 @@
 import { Link } from "react-router-dom";
+import Sceleton from "../skeleton/Skeleton";
+import "./teamInfo.scss";
 
-const ViewTeamInfo = ({ data: { team, stadion } }) => {
-    if (!team || !stadion) {
+const ViewTeamInfo = ({ data }) => {
+    if (!data)
         return (
-            <div className="team__games">
-                This Team has not a Stadion, sorry...
+            <div className="team">
+                <Sceleton className="team-sceleton" />
             </div>
         );
-    }
+    const { team, stadion } = data;
     const { id, teamName, founded, logo_path } = team;
-    const { name, surface, image_path, city, capacity, address } = stadion;
+    const { name: s_name, image_path, city, capacity } = stadion;
     return (
-        <div className="team__info">
-            <div key={id} className="team__basics">
-                <img src={logo_path} alt={teamName} />
-                <div>
-                    <div className="team__info-name">
-                        {teamName} ({city})
-                    </div>
-                    <div className="team__info-name">year: {founded}</div>
-                    <div className="team__btns">
-                        <Link
-                            to={`/last_games/${id}`}
-                            className="button button__main"
-                        >
-                            <div className="inner">last games</div>
-                        </Link>
-                        <Link
-                            to={`/teams/${id}`}
-                            className="button button__secondary"
-                        >
-                            <div className="inner">to page</div>
-                        </Link>
-                    </div>
-                </div>
+        <article className="team">
+            <h2 className="team-title">
+                {teamName} ({city})
+            </h2>
+            <article className="team-nav">
+                <img src={logo_path} alt={teamName} className="team-nav-img" />
+                <nav className="team-btns">
+                    <Link
+                        to={`/last_games/${id}`}
+                        className="button button__secondary"
+                    >
+                        <div className="inner">last games</div>
+                    </Link>
+                    <Link
+                        to={`/teams/${id}`}
+                        className="button button__secondary"
+                    >
+                        <div className="inner">to page</div>
+                    </Link>
+                </nav>
+            </article>
+            <div className="stadion">
+                <article className="stadion-info">
+                    <h2 className="stadion-title">{s_name}</h2>
+                    <h3 className="stadion-subtitle">
+                        Capacity: {capacity} peoples
+                    </h3>
+                    <h3 className="stadion-subtitle">year: {founded}</h3>
+                </article>
+                <img src={image_path} alt={s_name} className="stadion-img" />
             </div>
-            <div className="team__info-name">{name}</div>
-            <img
-                src={image_path}
-                style={{
-                    margin: "0 auto",
-                    background: "none",
-                    display: "block",
-                    width: "300px",
-                    height: "225px",
-                    objectFit: "contain",
-                }}
-                alt={name}
-            />
-            <ul className="team__games-list">
-                <li className="team__games-item">City: {city}</li>
-                <li className="team__games-item">
-                    Capacity: {capacity} peoples
-                </li>
-                <li className="team__games-item">surface: {surface}</li>
-                <li className="team__games-item">address: {address}</li>
-            </ul>
-        </div>
+        </article>
     );
 };
 

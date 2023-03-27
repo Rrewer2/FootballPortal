@@ -1,0 +1,45 @@
+@import "../../style/variables.scss";
+
+.head2head {
+    display: block;
+    &__title {
+        font-weight: bold;
+        font-size: 24px;
+        color: $main-color;
+        margin-top: 25px;
+    }
+    &__game {
+        font-weight: bold;
+        font-size: 22px;
+        cursor: pointer;
+        margin-top: 10px;
+        &:hover {
+            text-decoration: underline;
+        }
+        &-full {
+            font-size: 30px;
+            color: $main-color;
+        }
+        &-half {
+            color: $second-color;
+        }
+        &-winner {
+            color: goldenrod;
+        }
+        &-draw {
+            color: green;
+        }
+        &-loose {
+            color: grey;
+        }
+    }
+    &__back {
+        margin-top: 100px;
+        justify-self: end;
+        font-weight: bold;
+        font-size: 38px;
+        &:hover {
+            color: $main-color;
+        }
+    }
+}
