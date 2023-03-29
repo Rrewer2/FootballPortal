@@ -12,19 +12,19 @@ const newDate = (y, m, d) => {
     return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
 };
 
-const toString = (a, b, c, d, e, f) => `${a}-${b}-${c}/${d}-${e}-${f}`;
+const dateToString = (a, b, c, d, e, f) => `${a}-${b}-${c}/${d}-${e}-${f}`;
 
 export function* getPeriod(period) {
     const [Y, MM, DD] = newDate();
     let [nextY, nextMM, nextDD] = [Y, MM, DD];
     const getPrev = (y, m, d) => newDate(y, +m - 1 - period, d + 1);
     let [prevY, prevMM, prevDD] = getPrev(nextY, nextMM, nextDD);
-    yield toString(prevY, prevMM, prevDD, nextY, nextMM, nextDD);
+    yield dateToString(prevY, prevMM, prevDD, nextY, nextMM, nextDD);
 
     while (prevY > 2005) {
         [nextY, nextMM, nextDD] = newDate(prevY, +prevMM - 1, prevDD - 1);
         [prevY, prevMM, prevDD] = getPrev(nextY, nextMM, nextDD);
-        yield toString(prevY, prevMM, prevDD, nextY, nextMM, nextDD);
+        yield dateToString(prevY, prevMM, prevDD, nextY, nextMM, nextDD);
     }
 }
 export const newGenerator = (a) => getPeriod(a);
@@ -35,6 +35,13 @@ const getEmptyObj = (obj, par) =>
         )
     );
 export const findElemById = (arr, Id) => {
+    if (!arr[0])
+        return {
+            id: Id,
+            display_name: Id,
+            image_path:
+                "https://cdn.sportmonks.com/images/soccer/players/8/172104.png",
+        };
     const elem = arr.find(({ id }) => id === Id);
     if (!elem) {
         const player = arr.find(({ player_id }) => player_id === Id);
@@ -79,7 +86,6 @@ export const sliceTopscorers = (topScorers, teamId, length = 2) => {
 };
 
 export const getTopScorers = (slicedScorers, teams, allPlayers) => {
-    console.log(slicedScorers, teams, allPlayers);
     return slicedScorers.map((el) =>
         el.map(({ player_id, team_id, ...args }) => ({
             ...args,

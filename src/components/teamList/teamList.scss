@@ -14,9 +14,12 @@
         width: 100%;
         display: block;
         cursor: pointer;
+        &:hover {
+            text-decoration: underline;
+        }
         &-selected {
             box-shadow: 0 5px 20px $main-color;
-            transform: translateY(-8px);
+            // transform: translateY(-8px);
         }
         &-img {
             width: 100%;

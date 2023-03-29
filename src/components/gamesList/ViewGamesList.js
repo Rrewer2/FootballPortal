@@ -2,10 +2,8 @@ import { Link } from "react-router-dom";
 import { findElemById, getClassName } from "../../services/functions";
 import "./gamesList.scss";
 
-const ViewGamesList = ({ games, mainTeam, allTeams }) => {
-    if (!mainTeam) return <div className="games__list"></div>;
-
-    const items = games.map(
+const ViewGamesList = ({ season, allTeams }) =>
+    season.map(
         ({
             id,
             localteam_id,
@@ -60,6 +58,4 @@ const ViewGamesList = ({ games, mainTeam, allTeams }) => {
         }
     );
 
-    return <ul className="games__grid">{items}</ul>;
-};
 export default ViewGamesList;

@@ -3,20 +3,27 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import useFootballService from "./services/footballService";
 import AppHeader from "./components/appHeader/AppHeader";
 import Spinner from "./components/spinner/Spinner";
-import { newGenerator } from "./services/functions";
 
 const Page404 = lazy(() => import("./pages/404"));
 const MainPage = lazy(() => import("./pages/MainPage"));
-const GamesListPage = lazy(() => import("./pages/GamesListPage"));
 const GamePage = lazy(() => import("./pages/GamePage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
-
-let newPeriod = newGenerator(12);
+const TopPlayersPage = lazy(() => import("./pages/TopPlayersPage"));
 
 const App = () => {
     const [selectedCountry, setCountry] = useState("Scotland");
     const onCountrySelected = ({ target: { value } }) => {
         setCountry(value);
+    };
+
+    const [selectedTeam, setTeam] = useState(null);
+    const onTeamSelected = (team) => {
+        setTeam(team);
+    };
+
+    const [selectedGame, setGame] = useState(null);
+    const onGameSelected = (game) => {
+        setGame(game);
     };
 
     const [info, setInfo] = useState({});
@@ -44,23 +51,33 @@ const App = () => {
                     onCountrySelected={onCountrySelected}
                     flag={info?.image_path}
                     process={process}
+                    team={selectedTeam}
+                    game={selectedGame}
                 />
                 <Suspense fallback={<Spinner />}>
                     <Routes>
                         <Route path="/" element={<MainPage data={info} />} />
 
                         <Route
-                            path="/last_games/:teamId/"
-                            element={<GamesListPage />}
+                            path="/games/:gameId"
+                            element={
+                                <GamePage onGameSelected={onGameSelected} />
+                            }
                         />
-
-                        <Route path="/games/:gameId" element={<GamePage />} />
 
                         <Route
                             path="/teams/:teamId"
                             element={
-                                <TeamPage newPeriod={newPeriod} data={info} />
+                                <TeamPage
+                                    data={info}
+                                    onTeamSelected={onTeamSelected}
+                                />
                             }
+                        />
+
+                        <Route
+                            path="/scorers"
+                            element={<TopPlayersPage data={info} />}
                         />
 
                         <Route path="*" element={<Page404 />} />

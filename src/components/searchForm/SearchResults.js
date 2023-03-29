@@ -1,4 +1,4 @@
-import LayoutComponent from "../layoutComponent/LayoutComponent";
+import LayoutComponent from "../../services/LayoutComponent";
 import ViewSearchResults from "./ViewSearchResults";
 
 const SearchResults = (name) => (

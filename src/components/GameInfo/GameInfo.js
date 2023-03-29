@@ -1,12 +1,5 @@
-import LayoutComponent from "../layoutComponent/LayoutComponent";
 import ViewGameInfo from "./ViewGameInfo";
 
-const GameInfo = ({ selectedGame, gameId }) => (
-    <LayoutComponent
-        Component={ViewGameInfo}
-        funcName="getGameInfo"
-        param={[selectedGame, gameId]}
-    />
-);
+const GameInfo = ({ data }) => (!data ? null : ViewGameInfo(data));
 
 export default GameInfo;

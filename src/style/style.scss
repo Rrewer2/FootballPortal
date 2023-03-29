@@ -9,7 +9,7 @@
     box-sizing: border-box;
     text-align: center;
     opacity: 0;
-    animation: ggggg 2s ease-in-out forwards;
+    animation: ggggg 1s ease-in-out forwards;
 }
 
 ul,
@@ -57,6 +57,10 @@ input::-webkit-inner-spin-button {
 
 .main {
     margin-top: 10px;
+    &-spinner {
+        margin-top: 150px;
+        height: 100px;
+    }
 }
 
 .section-wrapper {
@@ -75,9 +79,9 @@ input::-webkit-inner-spin-button {
     align-items: flex-start;
 }
 .footer {
-    height: 40px;
+    // height: 20px;
     margin-top: 30px;
-    background-color: rgba(0, 0, 0, 0.25);
+    // background-color: rgba(0, 0, 0, 0.25);
 }
 @keyframes ggggg {
     from {

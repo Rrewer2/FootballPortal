@@ -1,8 +1,9 @@
 import { getParametr } from "../../services/functions";
 import { yellowcards, redcards } from "../../resources/svg-pictures";
-// import goals from "../../resources/goals.png";
-const cards = [yellowcards, redcards].map((item) => (
-    <td key={`elemName${item}`}>
+import ballSrc from "../../resources/soccer-ball.png";
+
+const cards = [yellowcards, redcards].map((item, i) => (
+    <td key={`cards${i}`}>
         <div className="topscorers-table__img">{item}</div>
     </td>
 ));
@@ -21,25 +22,26 @@ const ViewTopScorers = ({ data }) => {
             ...args
         } = obj;
         const param = getParametr(args);
-        elemNames = param.includes("yellowcards")
-            ? cards
-            : // : param.includes("goals") ? (
-              //     <td className="topscorers-table__header">
-              //         <img
-              //             className="topscorers-table__img"
-              //             src={goals}
-              //             alt="balls"
-              //         />
-              //     </td>
-              // )
-              param.map((item) => (
-                  <td
-                      className="topscorers-table__header"
-                      key={`elemName${item}`}
-                  >
-                      {item}
-                  </td>
-              ));
+        elemNames = param.includes("yellowcards") ? (
+            cards
+        ) : param.includes("goals") ? (
+            <td>
+                <img
+                    src={ballSrc}
+                    alt="goals"
+                    className="topscorers-table__ball"
+                />
+            </td>
+        ) : (
+            param.map((item) => (
+                <td
+                    className="topscorers-table__header"
+                    key={`elemName${item}`}
+                >
+                    {item}
+                </td>
+            ))
+        );
         const elemValues = param.map((item) => (
             <td className="topscorers-table__points" key={`elemValue${item}`}>
                 {obj[item]}

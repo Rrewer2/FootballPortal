@@ -1,13 +1,11 @@
 import { Link } from "react-router-dom";
 import "./standings.scss";
 
-const ViewStandings = ({ data, args }) => {
-    if (!data || !args) return <table className="standings-table"></table>;
-    const { ids } = args;
-    const isSelected = (ids, team_id) =>
-        ids.some((id) => id === team_id) ? "standings-table__selected" : "";
+const isSelected = (ids, team_id) =>
+    ids.some((id) => id === team_id) ? "standings-table__selected" : "";
 
-    const standings = data.map(
+const ViewStandings = (standings, selectedTeams) =>
+    standings.map(
         ({
             team_name,
             points,
@@ -25,7 +23,10 @@ const ViewStandings = ({ data, args }) => {
             },
         }) => (
             <tr
-                className={`standings-table__item ${isSelected(ids, team_id)}`}
+                className={`standings-table__item ${isSelected(
+                    selectedTeams,
+                    team_id
+                )}`}
                 key={round_id + team_id}
             >
                 <td>{position}</td>
@@ -46,24 +47,5 @@ const ViewStandings = ({ data, args }) => {
             </tr>
         )
     );
-    return (
-        <table className="standings-table">
-            <thead>
-                <tr className="standings-table__header">
-                    <td>Pos</td>
-                    <td>Team</td>
-                    <td>Games</td>
-                    <td>Won</td>
-                    <td>Draw</td>
-                    <td>Lost</td>
-                    <td>Goals +/-</td>
-                    <td>Points</td>
-                    <td>Form</td>
-                </tr>
-            </thead>
-            <tbody>{standings}</tbody>
-        </table>
-    );
-};
 
 export default ViewStandings;

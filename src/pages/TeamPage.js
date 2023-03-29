@@ -7,7 +7,9 @@ import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
 import GamesList from "../components/gamesList/GamesList";
 import TopScorers from "../components/topScorers/TopScorers";
 
-const TeamPage = ({ newPeriod, data }) => {
+let newPeriod = newGenerator(12);
+
+const TeamPage = ({ data, onTeamSelected }) => {
     const { teamId } = useParams();
     const [info, setInfo] = useState(null);
     const { process, setProcess, cleanError, teamPageInfo } =
@@ -31,6 +33,8 @@ const TeamPage = ({ newPeriod, data }) => {
                               ...newInfo.games,
                           ]),
                       }));
+
+                onTeamSelected(newInfo.mainTeam);
             })
             .catch((e) => {
                 console.log(e);
@@ -40,7 +44,10 @@ const TeamPage = ({ newPeriod, data }) => {
 
     useEffect(() => {
         loadMore();
-        return () => (newPeriod = newGenerator(12));
+        return () => {
+            newPeriod = newGenerator(12);
+            onTeamSelected(null);
+        };
     }, [data.topScorers]);
     const loadMore = () =>
         updateInfo(newPeriod.next().value, teamId, data.topScorers);
@@ -56,17 +63,25 @@ const TeamPage = ({ newPeriod, data }) => {
                 />
                 <title>{info?.mainTeam?.teamName ?? ""} page</title>
             </Helmet>
-            <section className="section-wrapper">
-                <TopScorers data={{ ...data, ...info }} />
-            </section>
-            <ErrorBoundary>
-                <GamesList info={info} loadMore={loadMore} process={process} />
-            </ErrorBoundary>
-            {/* <section className="section-wrapper">
+            <div className="main">
+                <section className="section-wrapper">
+                    <ErrorBoundary>
+                        <TopScorers data={{ ...data, ...info }} />
+                    </ErrorBoundary>
+                </section>
+                <ErrorBoundary>
+                    <GamesList
+                        info={info}
+                        loadMore={loadMore}
+                        process={process}
+                    />
+                </ErrorBoundary>
+                {/* <section className="section-wrapper">
                 <ErrorBoundary>
                     <Squad info={info} />
                 </ErrorBoundary>
             </section> */}
+            </div>
         </>
     );
 };

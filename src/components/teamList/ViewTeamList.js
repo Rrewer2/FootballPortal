@@ -1,20 +1,15 @@
 import React, { useRef } from "react";
 import "./teamList.scss";
 
-const ViewTeamList = ({ data, args }) => {
+const ViewTeamList = (teams, onTeamSelected) => {
     const { current } = useRef([]);
-
-    if (!data || !args) return <ul className="team__grid"></ul>;
-
-    const { onTeamSelected } = args;
     const focusOnItem = (i, id) => {
         current.map(({ classList }) => classList.remove("team__item-selected"));
         current[i].classList.add("team__item-selected");
         current[i].focus();
         onTeamSelected(id);
     };
-
-    const teams = data.map(({ id, logo_path, teamName, founded }, i) => {
+    return teams.map(({ id, logo_path, teamName }, i) => {
         const isLong = teamName?.length > 10 ? "team__item-name-long" : "";
         return (
             <li
@@ -42,10 +37,8 @@ const ViewTeamList = ({ data, args }) => {
                     alt={teamName}
                 />
                 <h2 className={`team__item-name ${isLong}`}>{teamName}</h2>
-                {/* <h3 className="team__item-descr">founded: {founded}</h3> */}
             </li>
         );
     });
-    return <ul className="team__grid">{teams}</ul>;
 };
 export default ViewTeamList;

@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import useFootballService from "../services/footballService";
 
-import RandomTeam from "../components/randomTeam/RandomTeam";
-import ViewTeamList from "../components/teamList/ViewTeamList";
-import ViewTeamInfo from "../components/teamInfo/ViewTeamInfo";
+import TeamList from "../components/teamList/TeamList";
+import TeamInfo from "../components/teamInfo/TeamInfo";
 import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
-import SearchForm from "../components/searchForm/SearchForm";
-import ViewStandings from "../components/standings/ViewStandings";
+import Spinner from "../components/spinner/Spinner";
+// import SearchForm from "../components/searchForm/SearchForm";
+import Standings from "../components/standings/Standings";
 import TopScorers from "../components/topScorers/TopScorers";
 
 const MainPage = ({ data }) => {
@@ -15,7 +15,6 @@ const MainPage = ({ data }) => {
     const [selectedTeam, setTeamId] = useState(null);
     const { process, setProcess, cleanError, mainPageInfo } =
         useFootballService();
-    // if (!data) return <main className="main"></main>;
 
     const { season_id, teams, topScorers } = data;
     const updateInfo = (season_id, topScorers) => {
@@ -34,7 +33,12 @@ const MainPage = ({ data }) => {
     useEffect(() => updateInfo(season_id, topScorers), [season_id]);
 
     const { venues, standings } = info;
-    if (!venues) return;
+    if (process === "loading" && !venues)
+        return (
+            <div className="main-spinner">
+                <Spinner />
+            </div>
+        );
     const onTeamSelected = (team_id) => {
         const team = teams.find(({ id }) => id === team_id);
         const stadion = venues.find(({ id }) => id === team.venue_id);
@@ -53,20 +57,20 @@ const MainPage = ({ data }) => {
 
             <section className="section-wrapper">
                 <ErrorBoundary>
-                    <ViewTeamList data={teams} args={{ onTeamSelected }} />
+                    <TeamList teams={teams} onTeamSelected={onTeamSelected} />
                 </ErrorBoundary>
             </section>
 
             <section className="section-wrapper grid-2col">
                 <ErrorBoundary>
-                    <ViewStandings
-                        data={standings}
-                        args={{ ids: [selectedTeam?.team?.id] }}
+                    <Standings
+                        standings={standings}
+                        selectedTeams={[selectedTeam?.team?.id]}
                     />
                 </ErrorBoundary>
 
                 <ErrorBoundary>
-                    <ViewTeamInfo data={selectedTeam} />
+                    <TeamInfo selectedTeam={selectedTeam} />
                 </ErrorBoundary>
             </section>
 
@@ -76,15 +80,9 @@ const MainPage = ({ data }) => {
 
             {/* <section className="section-wrapper">
                 <ErrorBoundary>
-                    <RandomTeam teams={teams} venues={venues} />
-                </ErrorBoundary>
-            </section> */}
-
-            <section className="section-wrapper">
-                <ErrorBoundary>
                     <SearchForm />
                 </ErrorBoundary>
-            </section>
+            </section> */}
         </main>
     );
 };

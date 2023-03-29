@@ -1,23 +1,38 @@
 @import "../../style/variables.scss";
 
 .head2head {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.25);
+    a {
+        display: block;
+        text-align: center;
+        &:hover {
+            text-decoration: underline;
+            color: $main-color;
+        }
+    }
+    tr {
+        box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.25);
+    }
     display: block;
+    &__table {
+        min-height: 288px;
+        width: 100%;
+    }
     &__title {
         font-weight: bold;
         font-size: 24px;
         color: $main-color;
-        margin-top: 25px;
+        margin-bottom: 10px;
     }
     &__game {
         font-weight: bold;
         font-size: 22px;
         cursor: pointer;
         margin-top: 10px;
-        &:hover {
-            text-decoration: underline;
-        }
         &-full {
-            font-size: 30px;
+            // font-size: 30px;
             color: $main-color;
         }
         &-half {
@@ -27,19 +42,14 @@
             color: goldenrod;
         }
         &-draw {
-            color: green;
+            color: black;
         }
         &-loose {
             color: grey;
         }
-    }
-    &__back {
-        margin-top: 100px;
-        justify-self: end;
-        font-weight: bold;
-        font-size: 38px;
-        &:hover {
-            color: $main-color;
+        &-date {
+            font-style: italic;
+            font-weight: normal;
         }
     }
 }

@@ -15,19 +15,21 @@ const useFootballService = () => {
     const getallTeams = getDataFromApi("teams/season/");
     const getTopScorers = getDataFromApi("topscorers/season/");
     const getPlayer = getDataFromApi("players/");
+    const getCommentaries = getDataFromApi("commentaries/fixture/");
+
+    const findComments = async (id) => await getCommentaries(id);
 
     const findPlayer = async (id) => await getPlayer(id);
 
-    const findFewPlayersById = async (topScorers, teamId) => {
-        const allPlayers = [];
-        const slicedTopcorers = sliceTopscorers(topScorers, teamId);
-        const ids = slicedTopcorers.flat().map((el) => el.player_id);
-
-        const length = ids.length;
-        for (let i = 0; i < length; i++) {
-            allPlayers.push(await findPlayer(ids[i]));
-        }
-        return { slicedTopcorers, allPlayers };
+    const findFewPlayersById = async (topScorers, teamId, count) => {
+        const slicedTopscorers = sliceTopscorers(topScorers, teamId, count);
+        const ids = slicedTopscorers
+            .flat()
+            .map(({ player_id }) => findPlayer(player_id));
+        const allPlayers = (await Promise.allSettled(ids)).map(
+            ({ value }) => value
+        );
+        return { slicedTopscorers, allPlayers };
     };
 
     const findTopscoreres = async (id) => {
@@ -102,22 +104,21 @@ const useFootballService = () => {
     //     return { team, allTeams };
     // };
 
-    const findFlag = async (countryId) => {
-        const country = await getCountry(countryId);
-        return country?.image_path;
-    };
+    // const findFlag = async (countryId) => {
+    //     const country = await getCountry(countryId);
+    //     return country?.image_path;
+    // };
+    // const findRandomTeam = async (selectedCountry) => {
+    //     const teams = await findCountryTeams(selectedCountry);
+    //     const team = teams[Math.round(Math.random() * teams.length - 1)];
+    //     const stadion = await findStadion(team.venue_id);
+
+    //     return { team, stadion };
+    // };
 
     const findCountryTeams = async (selectedCountry) => {
         const teams = await getCountry(`${selectedCountry}/teams`);
         return teams?.map(transformTeam);
-    };
-
-    const findRandomTeam = async (selectedCountry) => {
-        const teams = await findCountryTeams(selectedCountry);
-        const team = teams[Math.round(Math.random() * teams.length - 1)];
-        const stadion = await findStadion(team.venue_id);
-
-        return { team, stadion };
     };
 
     const findTeamInfoById = async (team_id) => {
@@ -157,18 +158,6 @@ const useFootballService = () => {
         const fixture = await getFixtures(gameId);
         return transformGame(fixture);
     };
-    const findGameInfo = async ([selectedGame, gameId]) => {
-        const id = selectedGame ? selectedGame : gameId;
-        const game = await findFixture(id);
-
-        const { localteam_id, visitorteam_id, venue_id } = game;
-
-        const local = await findOneTeam(localteam_id);
-        const visitor = await findOneTeam(visitorteam_id);
-        const stadion = await findStadion(venue_id);
-
-        return { game, local, visitor, stadion };
-    };
 
     const findSeasonTeams = async (season_id) => {
         const teams = await getallTeams(season_id);
@@ -185,54 +174,67 @@ const useFootballService = () => {
             ({ name }) => name === countryName
         );
         const season_id = await findSeason(id);
-        const seasonTeams = await findSeasonTeams(season_id);
-        const topScorers = await findTopscoreres(season_id);
 
-        return { teams: seasonTeams, season_id, topScorers, image_path };
+        return {
+            season_id,
+            image_path,
+            topScorers: await findTopscoreres(season_id),
+            teams: await findSeasonTeams(season_id),
+        };
     };
 
-    const mainPageInfo = async ({ season_id, topScorers }) => {
-        const venues = await getAllVenues(season_id);
-        const standings = await findStandings(season_id);
-        const { slicedTopcorers, allPlayers } = await findFewPlayersById(
-            topScorers
-        );
-        console.log(allPlayers);
-
-        return { venues, standings, allPlayers, slicedTopcorers };
-    };
+    const mainPageInfo = async ({ season_id, topScorers }) => ({
+        ...(await findFewPlayersById(topScorers)),
+        venues: await getAllVenues(season_id),
+        standings: await findStandings(season_id),
+    });
 
     const teamPageInfo = async ({ period, teamId, topScorers }) => {
-        const games = await findAllGamesByDate(period, teamId);
+        const games = findAllGamesByDate(period, teamId);
         const mainTeam = await findOneTeam(teamId);
-        const allTeams = await findCountryTeams(mainTeam.country_id);
-        const { slicedTopcorers, allPlayers } = await findFewPlayersById(
-            topScorers,
-            teamId
-        );
-        console.log(slicedTopcorers);
-        return { mainTeam, allTeams, games, allPlayers, slicedTopcorers };
-        // return;
+        const allTeams = findCountryTeams(mainTeam.country_id);
+        return {
+            mainTeam,
+            ...(await findFewPlayersById(topScorers, teamId)),
+            allTeams: await allTeams,
+            games: await games,
+        };
     };
 
-    const gamePageInfo = async () => {};
+    const gamePageInfo = async (gameId) => {
+        // let d = new Date().getTime();
+        // console.log("1game", d);
+        const game = await findFixture(gameId);
+        // console.log("2game", new Date().getTime() - d);
+        const head2Head = findHead2Head(gameId);
+        // console.log("3game", new Date().getTime() - d);
+        const { localteam_id, visitorteam_id } = game;
+        // console.log("4game", new Date().getTime() - d);
+        const local = findOneTeam(localteam_id);
+        // console.log("5game", new Date().getTime() - d);
+        const visitor = findOneTeam(visitorteam_id);
+        // console.log("6game", new Date().getTime() - d);
+        const comments = findComments(gameId);
+        // console.log("7game", new Date().getTime() - d);
 
-    // const getSingleGame = async (gameId) => {
-    //     const fixture = await getFixtures(gameId);
-    //     const game = transformGame(fixture);
+        return {
+            game,
+            head2Head: await head2Head,
+            local: await local,
+            visitor: await visitor,
+            comments: await comments,
+        };
+    };
 
-    //     const { localteam_id, visitorteam_id, venue_id } = game;
+    const topPlayersPageInfo = async (topScorers) => {
+        const { slicedTopscorers, allPlayers } = await findFewPlayersById(
+            topScorers,
+            null,
+            5
+        );
 
-    //     const local = await getOneTeam(localteam_id);
-    //     const visitor = await getOneTeam(visitorteam_id);
-    //     const stadion = await getStadion(venue_id);
-    //     const lastGames = await getHeadToHead(
-    //         `${localteam_id}/${visitorteam_id}`
-    //     );
-    //     const head2head = lastGames.slice(0, 10).map(transformGame);
-
-    //     return { game, local, visitor, stadion, head2head };
-    // };
+        return { allPlayers, slicedTopscorers };
+    };
 
     return {
         cleanError,
@@ -241,6 +243,8 @@ const useFootballService = () => {
         appInfo,
         mainPageInfo,
         teamPageInfo,
+        gamePageInfo,
+        topPlayersPageInfo,
     };
 };
 

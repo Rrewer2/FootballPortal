@@ -14,12 +14,14 @@ const GamesList = ({ info, loadMore, process }) => {
     const seasons = games.map((season, i) => (
         <article className="section-wrapper games__list" key={`season${i}`}>
             <h2 className="games__name">
-                {mainTeam.teamName}{" "}
+                {mainTeam.teamName}
                 {!i
                     ? " in current season"
                     : ` in season ${getYear(season) - 1} - ${getYear(season)}`}
             </h2>
-            {ViewGamesList({ games: season, mainTeam, allTeams })}
+            <ul className="games__grid">
+                {!season ? null : ViewGamesList({ season, allTeams })}
+            </ul>
         </article>
     ));
 

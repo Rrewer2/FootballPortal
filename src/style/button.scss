@@ -86,6 +86,7 @@
         background-color: $third-color;
     }
     &:hover {
+        text-decoration: underline;
         transform: translateY(-5px);
     }
     &:disabled {
