@@ -1,6 +1,7 @@
 import "./appBanner.scss";
 import footLogo from "../../resources/Football-Player.png";
 import footballLogo from "../../resources/football_player_PNG128.png";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 const AppBanner = () => (
     <div className="app-banner">
@@ -14,4 +15,4 @@ const AppBanner = () => (
     </div>
 );
 
-export default AppBanner;
+export default withErrorBoundary(AppBanner);

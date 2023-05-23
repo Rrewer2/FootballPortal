@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { findElemById, getClassName } from "../../services/functions";
+import { findElemById, getClassName } from "../../services/index";
 import "./gamesList.scss";
 
 const ViewGamesList = ({ season, allTeams }) =>

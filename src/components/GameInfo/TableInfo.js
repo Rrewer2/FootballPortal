@@ -1,4 +1,4 @@
-import { getClassName } from "../../services/functions";
+import { getClassName } from "../../services/index";
 import { Link } from "react-router-dom";
 
 const TableInfo = (

@@ -1,13 +1,13 @@
 import { Link } from "react-router-dom";
-import { getTopScorers } from "../../services/functions";
+import { getTopScorers } from "../../services/index";
 import ViewTopScorers from "./ViewTopScorers";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./topScorers.scss";
 
-const TopScorers = ({ data }) => {
-    const { slicedTopscorers, teams, allPlayers } = data;
-
+const TopScorers = ({ slicedTopscorers, teams, allPlayers }) => {
     if (!slicedTopscorers) return <table className="topscorers"></table>;
 
+    const headers = ["Top Scorers", "Top Assists", "Top Cardscorers"];
     const scorers = getTopScorers(slicedTopscorers, teams, allPlayers);
 
     return (
@@ -23,13 +23,7 @@ const TopScorers = ({ data }) => {
                               className="topscorers-table"
                               key={`topscorers-table${i}`}
                           >
-                              <h2>
-                                  {!i
-                                      ? "Top Scorers"
-                                      : i === 1
-                                      ? "Top Assists"
-                                      : "Top Cardscorers"}
-                              </h2>
+                              <h2>{headers[i]}</h2>
                               <ViewTopScorers data={data} />
                           </article>
                       ))}
@@ -38,4 +32,4 @@ const TopScorers = ({ data }) => {
     );
 };
 
-export default TopScorers;
+export default withErrorBoundary(TopScorers);

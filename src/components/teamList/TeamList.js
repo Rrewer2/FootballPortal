@@ -1,4 +1,5 @@
 import ViewTeamList from "./ViewTeamList";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./teamList.scss";
 
 const TeamList = ({ teams, onTeamSelected }) => (
@@ -7,4 +8,4 @@ const TeamList = ({ teams, onTeamSelected }) => (
     </ul>
 );
 
-export default TeamList;
+export default withErrorBoundary(TeamList);

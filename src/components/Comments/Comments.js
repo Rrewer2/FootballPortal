@@ -1,38 +1,6 @@
-import ballSrc from "../../resources/soccer-ball.png";
-import { yellowcards, redcards } from "../../resources/svg-pictures";
+import ViewComments from "./ViewComments";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./comments.scss";
-
-const commentsData = (data) =>
-    data.map(({ important, order, goal, minute, extra_minute, comment }) => (
-        <tr
-            className={
-                important || !minute
-                    ? "comments__item-important"
-                    : "comments__item"
-            }
-            key={order}
-        >
-            <td>
-                {extra_minute
-                    ? `${minute}+${extra_minute}`
-                    : minute
-                    ? minute
-                    : ""}
-            </td>
-            <td className="comments__img">
-                {goal ? (
-                    <img className="comments__img" src={ballSrc} alt="goal" />
-                ) : comment.includes("yellow card") ? (
-                    yellowcards
-                ) : comment.includes("red card") ? (
-                    redcards
-                ) : (
-                    ""
-                )}
-            </td>
-            <td className="comments__descr">{comment}</td>
-        </tr>
-    ));
 
 const Comments = ({ data }) =>
     !data || !data.length ? (
@@ -49,8 +17,8 @@ const Comments = ({ data }) =>
                     <td>Comments</td>
                 </tr>
             </thead>
-            <tbody>{commentsData(data)}</tbody>
+            <tbody>{ViewComments(data)}</tbody>
         </table>
     );
 
-export default Comments;
+export default withErrorBoundary(Comments);

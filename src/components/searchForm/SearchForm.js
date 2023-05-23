@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import SearchResults from "./SearchResults";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./searchForm.scss";
 
 const SearchForm = () => {
@@ -19,19 +20,9 @@ const SearchForm = () => {
             },
             onSubmit: ({ name }) => setTeam(name),
         });
-    let result = null;
-    if (name) {
-        result = SearchResults(name);
-    }
 
     return (
-        <article
-            className="search"
-            onBlur={(e) => {
-                console.log("Triggered because this input lost focus");
-                handleReset();
-            }}
-        >
+        <article className="search" onBlur={() => handleReset()}>
             <h2 className="search-title">Find a Team by name:</h2>
             <form className="search-form" onSubmit={handleSubmit}>
                 <input
@@ -54,9 +45,9 @@ const SearchForm = () => {
                     {errors.name}
                 </h2>
             ) : null}
-            {result}
+            {!name ? null : SearchResults(name)}
         </article>
     );
 };
 
-export default SearchForm;
+export default withErrorBoundary(SearchForm);

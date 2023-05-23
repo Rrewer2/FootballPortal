@@ -1,9 +1,13 @@
 import { Link } from "react-router-dom";
-import { getClassName } from "../../services/functions";
+import { getClassName } from "../../services/index";
 import "./head2Head.scss";
 
-const ViewHead2Head = ({ array, localId, l_name, visitId, v_name }) =>
-    array.map(
+const ViewHead2Head = ({
+    head2Head,
+    local: { id: localId, teamName: l_name },
+    visitor: { id: visitId, teamName: v_name },
+}) =>
+    head2Head.map(
         ({
             id,
             localteam_id,

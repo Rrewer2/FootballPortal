@@ -1,50 +1,25 @@
-import { useState, useEffect } from "react";
-import useFootballService from "../services/footballService";
-import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
-import Spinner from "../components/spinner/Spinner";
+import useMyEffect from "../hooks/useMyEffect";
+import { Helmet } from "react-helmet";
 import AppBanner from "../components/appBanner/AppBanner";
 import TopScorers from "../components/topScorers/TopScorers";
 
-const TopPlayersPage = ({ data }) => {
-    const [info, setInfo] = useState(null);
-    const { process, setProcess, cleanError, topPlayersPageInfo } =
-        useFootballService();
-
-    const updateInfo = () => {
-        if (!data?.topScorers) return;
-        cleanError();
-        topPlayersPageInfo(data.topScorers)
-            .then((newInfo) => {
-                setProcess("render");
-                setInfo(newInfo);
-            })
-            .catch((e) => {
-                console.log(e);
-                setProcess("error");
-            });
-    };
-
-    useEffect(() => {
-        updateInfo();
-    }, [data.topScorers]);
-
-    if (process === "loading")
-        return (
-            <div className="main-spinner">
-                <Spinner />
-            </div>
-        );
+export default function TopPlayersPage(data) {
+    const [info, status] = useMyEffect(
+        "topPlayersPageInfo",
+        data.topScorers,
+        data
+    );
 
     return (
         <>
+            <Helmet>
+                <meta name="description" content="Top players page" />
+                <title>Top players</title>
+            </Helmet>
             <AppBanner />
-            <ErrorBoundary>
-                <section className="section-wrapper">
-                    <TopScorers data={{ ...data, ...info }} />
-                </section>
-            </ErrorBoundary>
+            <section className="section-wrapper">
+                <TopScorers {...data} {...info} />
+            </section>
         </>
     );
-};
-
-export default TopPlayersPage;
+}

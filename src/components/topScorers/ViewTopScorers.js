@@ -1,4 +1,4 @@
-import { getParametr } from "../../services/functions";
+import { getParametr } from "../../services/index";
 import { yellowcards, redcards } from "../../resources/svg-pictures";
 import ballSrc from "../../resources/soccer-ball.png";
 

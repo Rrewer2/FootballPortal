@@ -22,4 +22,10 @@ class ErrorBoundary extends Component {
     }
 }
 
-export default ErrorBoundary;
+export default function withErrorBoundary(Child) {
+    return (props) => (
+        <ErrorBoundary>
+            <Child {...props} />
+        </ErrorBoundary>
+    );
+}

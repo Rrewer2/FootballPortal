@@ -9,7 +9,14 @@ const Spinner = () => (
     >
         <g transform="translate(80,50)">
             <g transform="rotate(0)">
-                <circle cx="0" cy="0" r="7" fill="#1c4595" fillOpacity="1">
+                <circle
+                    cx="0"
+                    cy="0"
+                    r="7"
+                    fill="#1c4595"
+                    fillOpacity="1"
+                    className="anim"
+                >
                     <animateTransform
                         attributeName="transform"
                         type="scale"
@@ -19,14 +26,14 @@ const Spinner = () => (
                         dur="1s"
                         repeatCount="indefinite"
                     ></animateTransform>
-                    <animate
+                    {/* <animate
                         attributeName="fillOpacity"
                         keyTimes="0;1"
                         dur="1s"
                         repeatCount="indefinite"
                         values="1;0"
                         begin="-0.875s"
-                    ></animate>
+                    ></animate> */}
                 </circle>
             </g>
         </g>

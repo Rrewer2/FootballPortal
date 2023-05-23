@@ -1,6 +1,6 @@
-import { lazy, Suspense, useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import useFootballService from "./services/footballService";
+import { lazy, Suspense, useState } from "react";
+import useMyEffect from "./hooks/useMyEffect";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppHeader from "./components/appHeader/AppHeader";
 import Spinner from "./components/spinner/Spinner";
 
@@ -10,83 +10,42 @@ const GamePage = lazy(() => import("./pages/GamePage"));
 const TeamPage = lazy(() => import("./pages/TeamPage"));
 const TopPlayersPage = lazy(() => import("./pages/TopPlayersPage"));
 
-const App = () => {
-    const [selectedCountry, setCountry] = useState("Scotland");
-    const onCountrySelected = ({ target: { value } }) => {
-        setCountry(value);
-    };
+export default function App() {
+    // return <Spinner />;
+    const [country, setCountry] = useState("Scotland");
+    const [data, status] = useMyEffect("appInfo", country);
+    const [team, setTeam] = useState(null);
+    const [game, setGame] = useState(null);
 
-    const [selectedTeam, setTeam] = useState(null);
-    const onTeamSelected = (team) => {
-        setTeam(team);
-    };
-
-    const [selectedGame, setGame] = useState(null);
-    const onGameSelected = (game) => {
-        setGame(game);
-    };
-
-    const [info, setInfo] = useState({});
-
-    const { process, setProcess, cleanError, appInfo } = useFootballService();
-    const updateInfo = () => {
-        cleanError();
-        appInfo(selectedCountry)
-            .then((data) => {
-                setProcess("render");
-                setInfo(data);
-            })
-            .catch((e) => {
-                console.log(e);
-                setProcess("error");
-            });
-    };
-
-    useEffect(updateInfo, [selectedCountry]);
-
+    const routes = (
+        <Suspense fallback={<Spinner />}>
+            <Routes>
+                <Route path="/" element={<MainPage {...data} />} />
+                <Route
+                    path="/games/:gameId"
+                    element={<GamePage setGame={setGame} />}
+                />
+                <Route
+                    path="/teams/:teamId"
+                    element={<TeamPage {...{ data, setTeam }} />}
+                />
+                <Route path="/scorers" element={<TopPlayersPage {...data} />} />
+                <Route path="*" element={<Page404 />} />
+            </Routes>
+        </Suspense>
+    );
     return (
-        <Router>
+        <BrowserRouter>
             <div className="app">
                 <AppHeader
-                    onCountrySelected={onCountrySelected}
-                    flag={info?.image_path}
-                    process={process}
-                    team={selectedTeam}
-                    game={selectedGame}
+                    {...{ setCountry, status, team, game }}
+                    flag={data?.image_path}
                 />
-                <Suspense fallback={<Spinner />}>
-                    <Routes>
-                        <Route path="/" element={<MainPage data={info} />} />
-
-                        <Route
-                            path="/games/:gameId"
-                            element={
-                                <GamePage onGameSelected={onGameSelected} />
-                            }
-                        />
-
-                        <Route
-                            path="/teams/:teamId"
-                            element={
-                                <TeamPage
-                                    data={info}
-                                    onTeamSelected={onTeamSelected}
-                                />
-                            }
-                        />
-
-                        <Route
-                            path="/scorers"
-                            element={<TopPlayersPage data={info} />}
-                        />
-
-                        <Route path="*" element={<Page404 />} />
-                    </Routes>
-                </Suspense>
+                {status === "error" && <h2>Error Internet Connection</h2>}
+                {status === "loading" && <Spinner />}
+                {status === "render" && routes}
                 <footer className="footer"></footer>
             </div>
-        </Router>
+        </BrowserRouter>
     );
-};
-
-export default App;
+}

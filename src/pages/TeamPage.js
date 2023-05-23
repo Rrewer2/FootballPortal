@@ -1,56 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import useFootballService from "../services/footballService";
-import { newGenerator, separateArray } from "../services/functions";
-import ErrorBoundary from "../components/errorBoundary/ErrorBoundary";
+import useFootballService from "../hooks/useFootballService";
+import { newGenerator, setInfoSettings } from "../services/index";
 import GamesList from "../components/gamesList/GamesList";
 import TopScorers from "../components/topScorers/TopScorers";
 
 let newPeriod = newGenerator(12);
 
-const TeamPage = ({ data, onTeamSelected }) => {
+export default function TeamPage({ data, setTeam }) {
     const { teamId } = useParams();
     const [info, setInfo] = useState(null);
-    const { process, setProcess, cleanError, teamPageInfo } =
-        useFootballService();
+    const ref = useRef(null);
+    const { status, teamPageInfo } = useFootballService();
 
-    const updateInfo = (period, teamId, topScorers) => {
-        if (!topScorers) return;
-        cleanError();
-        teamPageInfo({ period, teamId: +teamId, topScorers })
-            .then((newInfo) => {
-                setProcess("render");
-                !info
-                    ? setInfo(() => ({
-                          ...newInfo,
-                          games: separateArray(newInfo.games),
-                      }))
-                    : setInfo((info) => ({
-                          ...info,
-                          games: separateArray([
-                              ...info.games.flat(),
-                              ...newInfo.games,
-                          ]),
-                      }));
-
-                onTeamSelected(newInfo.mainTeam);
-            })
-            .catch((e) => {
-                console.log(e);
-                setProcess("error");
-            });
+    const setAllInfo = (res) => {
+        setInfo((prev) => setInfoSettings(prev, res));
+        setTeam(res.mainTeam);
     };
 
     useEffect(() => {
-        loadMore();
+        const bbb = data?.topScorers;
+        if (bbb && ref.current !== bbb) {
+            ref.current = bbb;
+            loadMore();
+        }
         return () => {
             newPeriod = newGenerator(12);
-            onTeamSelected(null);
+            setTeam(null);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data.topScorers]);
-    const loadMore = () =>
-        updateInfo(newPeriod.next().value, teamId, data.topScorers);
+
+    const loadMore = async () =>
+        setAllInfo(
+            await teamPageInfo({
+                period: newPeriod.next().value,
+                teamId: +teamId,
+                topScorers: data.topScorers,
+            })
+        );
 
     return (
         <>
@@ -65,25 +54,13 @@ const TeamPage = ({ data, onTeamSelected }) => {
             </Helmet>
             <div className="main">
                 <section className="section-wrapper">
-                    <ErrorBoundary>
-                        <TopScorers data={{ ...data, ...info }} />
-                    </ErrorBoundary>
+                    <TopScorers {...data} {...info} />
                 </section>
-                <ErrorBoundary>
-                    <GamesList
-                        info={info}
-                        loadMore={loadMore}
-                        process={process}
-                    />
-                </ErrorBoundary>
+                <GamesList info={info} loadMore={loadMore} status={status} />
                 {/* <section className="section-wrapper">
-                <ErrorBoundary>
                     <Squad info={info} />
-                </ErrorBoundary>
-            </section> */}
+                </section> */}
             </div>
         </>
     );
-};
-
-export default TeamPage;
+}

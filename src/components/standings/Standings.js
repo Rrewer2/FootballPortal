@@ -1,7 +1,8 @@
 import ViewStandings from "./ViewStandings";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./standings.scss";
 
-const Standings = ({ standings, selectedTeams }) => (
+const Standings = ({ standings, selectedTeams, status }) => (
     <table className="standings-table">
         <thead>
             <tr className="standings-table__header">
@@ -22,4 +23,4 @@ const Standings = ({ standings, selectedTeams }) => (
     </table>
 );
 
-export default Standings;
+export default withErrorBoundary(Standings);

@@ -1,5 +1,6 @@
 import ViewTeamInfo from "./ViewTeamInfo";
 import Sceleton from "../skeleton/Skeleton";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./teamInfo.scss";
 
 const TeamInfo = ({ selectedTeam }) => (
@@ -12,4 +13,4 @@ const TeamInfo = ({ selectedTeam }) => (
     </article>
 );
 
-export default TeamInfo;
+export default withErrorBoundary(TeamInfo);

@@ -1,3 +1,4 @@
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./skeleton.scss";
 
 const Skeleton = () => (
@@ -17,4 +18,4 @@ const Skeleton = () => (
     </>
 );
 
-export default Skeleton;
+export default withErrorBoundary(Skeleton);

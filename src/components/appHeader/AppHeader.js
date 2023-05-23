@@ -1,9 +1,10 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Spinner from "../spinner/Spinner";
 import AppHeaderForm from "./AppHeaderForm";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./appHeader.scss";
 
-const AppHeader = ({ onCountrySelected, flag, process, team, game }) => {
+const AppHeader = ({ setCountry, flag, status, team, game }) => {
     const navigate = useNavigate();
 
     return (
@@ -20,7 +21,7 @@ const AppHeader = ({ onCountrySelected, flag, process, team, game }) => {
                 </h2>
             </Link>
             {!team && !game ? (
-                <AppHeaderForm onCountrySelected={onCountrySelected} />
+                <AppHeaderForm setCountry={setCountry} />
             ) : team ? (
                 <h1 className="app-header__team-name">{team?.teamName}</h1>
             ) : (
@@ -28,7 +29,7 @@ const AppHeader = ({ onCountrySelected, flag, process, team, game }) => {
                     {`${game.local.teamName} vs ${game.visitor.teamName}`}
                 </h1>
             )}
-            {process === "loading" ? (
+            {status === "loading" ? (
                 <Spinner className="spinner" />
             ) : !game ? (
                 <img
@@ -52,4 +53,4 @@ const AppHeader = ({ onCountrySelected, flag, process, team, game }) => {
     );
 };
 
-export default AppHeader;
+export default withErrorBoundary(AppHeader);

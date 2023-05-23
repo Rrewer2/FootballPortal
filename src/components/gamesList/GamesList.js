@@ -1,15 +1,15 @@
 import ViewGamesList from "./ViewGamesList";
 import ErrorMessage from "../errorMessage/ErrorMessage";
-import { getYear } from "../../services/functions";
+import { getYear } from "../../services/index";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 import "./gamesList.scss";
 
-const GamesList = ({ info, loadMore, process }) => {
+const GamesList = ({ info, loadMore, status }) => {
     if (!info) return <div className="games"></div>;
 
     const { mainTeam, allTeams, games } = info;
 
-    const errorMessage = process === "error" ? <ErrorMessage /> : null;
-    const text = process === "loading" ? "loading..." : "previous games";
+    const text = status === "loading" ? "loading..." : "previous games";
 
     const seasons = games.map((season, i) => (
         <article className="section-wrapper games__list" key={`season${i}`}>
@@ -28,11 +28,11 @@ const GamesList = ({ info, loadMore, process }) => {
     return (
         <div className="games">
             {seasons}
-            {errorMessage}
+            {status === "error" && <ErrorMessage />}
             <button
                 className="button button__main button__long"
                 onClick={loadMore}
-                disabled={process === "loading"}
+                disabled={status === "loading"}
             >
                 <div className="inner">{text}</div>
             </button>
@@ -40,4 +40,4 @@ const GamesList = ({ info, loadMore, process }) => {
     );
 };
 
-export default GamesList;
+export default withErrorBoundary(GamesList);

@@ -1,5 +1,6 @@
 import ViewGameInfo from "./ViewGameInfo";
+import withErrorBoundary from "../errorBoundary/ErrorBoundary";
 
-const GameInfo = ({ data }) => (!data ? null : ViewGameInfo(data));
+const GameInfo = ({ data }) => (!data?.game ? null : ViewGameInfo(data));
 
-export default GameInfo;
+export default withErrorBoundary(GameInfo);
